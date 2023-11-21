@@ -30,10 +30,12 @@ class Krot
 	pos pos_krot; //позиция крота
 	int krot_map[10][10]{ 0 };
 	bool completing_the_map();
+	void print_map();
+	void input_error();
 public:
 	void creating_map();//создание карты
 	void save_map();//запись карты в файл
 	bool load_map();//считывание исходных данных из файла
-	void go_gaem();//начало игры
+	void go_game();//начало игры
 
 };

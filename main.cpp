@@ -9,6 +9,10 @@ int main()
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
     Krot krot;
+	//for (int i = 0; i < 256; i++)
+	//{
+	//	std::cout << i << "   "<<(char)i << std::endl;
+	//}
 	while (true)
 	{
 		menu();
@@ -30,5 +34,5 @@ int main()
 
 	}
 
-    
+ //   
 }

@@ -35,9 +35,141 @@ bool Krot::completing_the_map()
 	krot_map[pos_krot.pos_x][pos_krot.pos_y] = 9;
 	return true;
 }
+void Krot::print_map()
+{
+	std::cout << "O--------------------O\n";
+	for (int i = 0; i < 10; ++i)
+	{
+		std::cout << "|";
+		for (int j = 0; j < 10; ++j)
+		{
+			if (krot_map[j][i] == 0) std::cout << "  ";//пустая ячейка
+			if (krot_map[j][i] == 9) std::cout << " "<<(char)164;//крот
+			if (krot_map[j][i] == 1) std::cout << " " << (char)35;//блок
+			if (krot_map[j][i] == 2) std::cout << " " << (char)149;//цель
+			if (krot_map[j][i] == 3) std::cout << " " << (char)169;//занятая цель
+		}
+		std::cout << "|\n";
+	}
+	std::cout << "O--------------------O\n";
+}
+void Krot::input_error()
+{
+	std::cin.clear();
+	std::cin.ignore(32767, '\n');
+	std::cout << "Выбор не определен. Повторитее попытку.\n";
+	system("pause");
+}
 
-void Krot::creating_map();//создание карты
-void Krot::save_map();//запись карты в файл
+void Krot::creating_map()//создание карты
+{
+	std::string choice;
+	int x, y, x1, y1;
+	while (true)
+	{
+		system("cls");
+		print_map();
+		std::cout << "\n\n\nКакую операцию желаете провести: \n";
+		std::cout << "1. Указать координаты крота.\n";
+		std::cout << "2. Указать координаты блока и точки цели.\n";
+		std::cout << "0. Выход в предыдущее меню.\n";
+		std::cin >> choice;
+		if (std::cin.fail())
+		{
+			input_error();
+			continue;
+		}
+		if (choice[0] == '1')
+		{
+			std::cout << "Координаты крота по оси х: ";
+			std::cin >> x;
+			if (std::cin.fail())
+			{
+				input_error();
+				continue;
+			}
+			std::cout << "Координаты крота по оси y: ";
+			std::cin >> y;
+			if (std::cin.fail())
+			{
+				input_error();
+				continue;
+			}
+			if (x < 1 || x>10 || y < 1 || y>10)
+			{
+				std::cout << "Координаты вне карты. повторите выбор.\n";
+				system("pause");
+				continue;
+			}
+			if (krot_map[x-1][y-1] != 0)
+			{
+				std::cout << "\nДанная позиция занята. Повторите выбор.\n";
+				system("pause");
+				continue;
+			}
+			pos_krot.pos_x = x-1;
+			pos_krot.pos_y = y-1;
+			completing_the_map();
+			continue;
+		}
+		if (choice[0] == '2')
+		{
+			std::cout << "Координаты блока по оси х: ";
+			std::cin >> x;
+			if (std::cin.fail())
+			{
+				input_error();
+				continue;
+			}
+			std::cout << "Координаты блока по оси y: ";
+			std::cin >> y;
+			if (std::cin.fail())
+			{
+				input_error();
+				continue;
+			}
+			std::cout << "Координаты точки назначения по оси х: ";
+			std::cin >> x1;
+			if (std::cin.fail())
+			{
+				input_error();
+				continue;
+			}
+			std::cout << "Координаты точки назначения по оси y: ";
+			std::cin >> y1;
+			if (std::cin.fail())
+			{
+				input_error();
+				continue;
+			}
+
+			if (x < 1 || x>10 || y < 1 || y>10||x1 < 1 || x1>10 || y1 < 1 || y1>10)
+			{
+				std::cout << "Координаты вне карты. повторите выбор.\n";
+				system("pause");
+				continue;
+			}
+			if (krot_map[x-1][y-1] != 0|| krot_map[x1-1][y1-1] )
+			{
+				std::cout << "\nОдна из позиций занята. Повторите выбор.\n";
+				system("pause");
+				continue;
+			}
+			pos add_block(x-1, y-1);
+			block.push_back(add_block);
+			pos add_destination_point(x1-1, y1-1);
+			destination_point.push_back(add_destination_point);
+			count_block++;
+			completing_the_map();
+			continue;
+		}
+		if (choice[0] == '0') break;
+	}
+}
+void Krot::save_map()//запись карты в файл
+{
+
+}
 bool Krot::load_map()
 {
 	std::string file_name;
@@ -50,7 +182,7 @@ bool Krot::load_map()
 		std::cin.ignore(32767, '\n');
 		std::cout << "\nОшибка ввода. Выход в предыдущее меню.\n";
 		system("pause");
-		return;
+		return false;
 	}
 	file_name += ".map";
 	count_block = 0;
@@ -61,7 +193,7 @@ bool Krot::load_map()
 	{
 		std::cout << "\nТакого файла не существует. Выход в предыдущее меню.\n";
 		system("pause");
-		return;
+		return false;
 	}
 	if (!in_file)
 	{
@@ -100,4 +232,7 @@ bool Krot::load_map()
 	if(!completing_the_map()) return false;
 	return true;
 }
-void Krot::go_gaem();//начало игры
+void Krot::go_game()//начало игры
+{
+
+}
