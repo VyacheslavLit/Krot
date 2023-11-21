@@ -36,9 +36,33 @@ bool Krot::completing_the_map()
 	return true;
 }
 
-bool Krot::reading_file_data(std::string file_name)
+void Krot::creating_map();//создание карты
+void Krot::save_map();//запись карты в файл
+bool Krot::load_map()
 {
+	std::string file_name;
+	system("cls");
+	std::cout << "Введите название файла для считывания: ";
+	std::cin >> file_name;
+	if (std::cin.fail())
+	{
+		std::cin.clear();
+		std::cin.ignore(32767, '\n');
+		std::cout << "\nОшибка ввода. Выход в предыдущее меню.\n";
+		system("pause");
+		return;
+	}
+	file_name += ".map";
+	count_block = 0;
+	block.clear();
+	destination_point.clear();
 	std::ifstream in_file(file_name);
+	if (in_file.bad())
+	{
+		std::cout << "\nТакого файла не существует. Выход в предыдущее меню.\n";
+		system("pause");
+		return;
+	}
 	if (!in_file)
 	{
 		std::cout << "Чтение файла с картой не удачно!\n";
@@ -76,3 +100,4 @@ bool Krot::reading_file_data(std::string file_name)
 	if(!completing_the_map()) return false;
 	return true;
 }
+void Krot::go_gaem();//начало игры

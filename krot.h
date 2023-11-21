@@ -8,6 +8,7 @@
 
 struct pos
 {
+	pos() {}
 	pos(int x, int y):pos_x(x), pos_y(y)
 	{}
 	int pos_x = 0;//x, y позиция объекта на карте
@@ -30,5 +31,9 @@ class Krot
 	int krot_map[10][10]{ 0 };
 	bool completing_the_map();
 public:
-	bool reading_file_data(std::string);//считывание исходных данных из файла
+	void creating_map();//создание карты
+	void save_map();//запись карты в файл
+	bool load_map();//считывание исходных данных из файла
+	void go_gaem();//начало игры
+
 };
