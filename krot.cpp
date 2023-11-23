@@ -35,6 +35,16 @@ bool Krot::completing_the_map()
 	krot_map[pos_krot.pos_x][pos_krot.pos_y] = 9;
 	return true;
 }
+void Krot::input_error()
+{
+	std::cin.clear();
+	std::cin.ignore(32767, '\n');
+	std::cout << "Выбор не определен. Повторитее попытку.\n";
+	system("pause");
+}
+
+
+
 void Krot::print_map()
 {
 	std::cout << "O--------------------O\n";
@@ -53,14 +63,6 @@ void Krot::print_map()
 	}
 	std::cout << "O--------------------O\n";
 }
-void Krot::input_error()
-{
-	std::cin.clear();
-	std::cin.ignore(32767, '\n');
-	std::cout << "Выбор не определен. Повторитее попытку.\n";
-	system("pause");
-}
-
 void Krot::creating_map()//создание карты
 {
 	std::string choice;
@@ -168,7 +170,40 @@ void Krot::creating_map()//создание карты
 }
 void Krot::save_map()//запись карты в файл
 {
-
+	std::string file_name;
+	system("cls");
+	std::cout << "Введите название файла для записи: ";
+	std::cin >> file_name;
+	if (std::cin.fail())
+	{
+		input_error();
+		return;
+	}
+	file_name += ".map";
+	std::ofstream in_file(file_name);
+	if (in_file.bad())
+	{
+		std::cout << "\nОшибка открытия файла для записи. Выход в предыдущее меню.\n";
+		system("pause");
+		return;
+	}
+	//записываем количество блоков
+	in_file << count_block << '\n';
+	//записываем координаты блоков
+	for (int i = 0; i < count_block; i++)
+	{
+		in_file << block[i].pos_x << '\n';
+		in_file << block[i].pos_y << '\n';
+	}
+	//записываем координаты точек назначения
+	for (int i = 0; i < count_block; i++)
+	{
+		in_file << destination_point[i].pos_x << '\n';
+		in_file << destination_point[i].pos_y << '\n';
+	}
+	//записываем координаты крота
+	in_file << pos_krot.pos_x << '\n';
+	in_file << pos_krot.pos_y << '\n';
 }
 bool Krot::load_map()
 {
@@ -178,10 +213,7 @@ bool Krot::load_map()
 	std::cin >> file_name;
 	if (std::cin.fail())
 	{
-		std::cin.clear();
-		std::cin.ignore(32767, '\n');
-		std::cout << "\nОшибка ввода. Выход в предыдущее меню.\n";
-		system("pause");
+		input_error();
 		return false;
 	}
 	file_name += ".map";

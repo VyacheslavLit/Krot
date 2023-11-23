@@ -2,3 +2,5 @@
 
 
 void menu();
+
+void tmp();
