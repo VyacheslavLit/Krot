@@ -1,19 +1,19 @@
 #include "krot.h"
+#include <conio.h>
 
-bool Krot::completing_the_map()
+
+	/*
+	1-блок
+	2-точка назначения
+	3-точка назначения занятая блоклм
+	8-точка назначения занятая кротом
+	9-крот
+	0-пустая ячейка
+	*/
+bool Krot::completing_the_map()//комплектование карты изходя из позиций блоков, крота и точек назначения
 {
+
 	for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) krot_map[i][j] = 0;//обнуление карты
-	//заносим блоки на карту
-	for (int i = 0; i < count_block; i++)
-	{
-		if (krot_map[block[i].pos_x][block[i].pos_y])//проверка на занятость ячейки
-		{
-			std::cout << std::endl << "Конфликт объектов, карта обнуляется.\n";
-			for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) krot_map[i][j] = 0;//обнуление карты
-			return false;
-		}
-		krot_map[block[i].pos_x][block[i].pos_y] = 1;
-	}
 	//заносим точки назначения на карту
 	for (int i = 0; i < count_block; i++)
 	{
@@ -25,8 +25,24 @@ bool Krot::completing_the_map()
 		}
 		krot_map[destination_point[i].pos_x][destination_point[i].pos_y] = 2;
 	}
+	//заносим блоки на карту
+	for (int i = 0; i < count_block; i++)
+	{
+		if (krot_map[block[i].pos_x][block[i].pos_y]==1|| krot_map[block[i].pos_x][block[i].pos_y] == 3)//проверка на занятость ячейки
+		{
+			std::cout << std::endl << "Конфликт объектов, карта обнуляется.\n";
+			for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) krot_map[i][j] = 0;//обнуление карты
+			return false;
+		}
+		if (krot_map[block[i].pos_x][block[i].pos_y] == 2)//проверка на занятость ячейки точкой назначения
+		{
+			krot_map[block[i].pos_x][block[i].pos_y] = 3;
+			continue;
+		}
+		krot_map[block[i].pos_x][block[i].pos_y] = 1;
+	}
 	//заносим крота на карту
-	if (krot_map[pos_krot.pos_x][pos_krot.pos_y])//проверка на занятость ячейки
+	if (krot_map[pos_krot.pos_x][pos_krot.pos_y]==1|| krot_map[pos_krot.pos_x][pos_krot.pos_y] == 3)//проверка на занятость ячейки
 	{
 		std::cout << std::endl << "Конфликт объектов, карта обнуляется.\n";
 		for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) krot_map[i][j] = 0;//обнуление карты
@@ -42,8 +58,49 @@ void Krot::input_error()
 	std::cout << "Выбор не определен. Повторитее попытку.\n";
 	system("pause");
 }
+void Krot::distination_to(int x, int y)//отработка движения крота
+{
+	if (pos_krot.pos_x + x < 0 || pos_krot.pos_x + x > 9 || pos_krot.pos_y + y > 9 || pos_krot.pos_y + y < 0) return;//отработка ситуации выхода за границу
+	if (krot_map[pos_krot.pos_x + x][pos_krot.pos_y + y] == 0|| krot_map[pos_krot.pos_x + x][pos_krot.pos_y + y] == 2)//отработка ситуации перехода на пустую клетку
+	{
+		pos_krot.pos_x += x;
+		pos_krot.pos_y += y;
+		completing_the_map();
+		return;
+	}
+	if (krot_map[pos_krot.pos_x + x][pos_krot.pos_y + y] == 1 || krot_map[pos_krot.pos_x + x][pos_krot.pos_y + y] == 3)//отработка ситуации перед кротом блок
+	{
+		if (pos_krot.pos_x + 2 * x < 0 || pos_krot.pos_x + 2 * x > 9 || pos_krot.pos_y + 2 * y > 9 || pos_krot.pos_y + 2 * y < 0) return;//отработка ситуации за блоком граница
+		if (krot_map[pos_krot.pos_x + 2 * x][pos_krot.pos_y + 2 * y] == 1|| krot_map[pos_krot.pos_x + 2 * x][pos_krot.pos_y + 2 * y] == 3) return;//отработка ситуации за блоком - блок
+	
+		pos_krot.pos_x += x;//смена позиции крота
+		pos_krot.pos_y += y;
 
+		for (int i = 0; i < count_block; i++)//поиск нужного блока и смена его позиции
+		{
+			if (block[i].pos_x == (pos_krot.pos_x) && block[i].pos_y == (pos_krot.pos_y))//ищем нужный блок
+			{
+				block[i].pos_x += x;
+				block[i].pos_y += y;
+				if (krot_map[block[i].pos_x][block[i].pos_y] == 2)block[i].occupancy = true;
+				else block[i].occupancy = false;
+				break;
+			}
+		}
 
+		completing_the_map();
+		return;
+	}
+
+}
+bool Krot::the_end()
+{
+	for (int i = 0; i < count_block; i++)//проверка, что все блоки на точке назначения
+	{
+		if (!block[i].occupancy)return false;
+	}
+	return true;
+}
 
 void Krot::print_map()
 {
@@ -266,5 +323,25 @@ bool Krot::load_map()
 }
 void Krot::go_game()//начало игры
 {
-
+	char distination;//переменная считывания направления
+	while (true)
+	{
+		system("cls");
+		print_map();
+		if (the_end())//проверка на конец игры
+		{
+			std::cout << "Игра пройдена!!! ТЫ ВЫИГРАЛ!!!\n";
+			system("pause");
+			return;
+		}
+		std::cout << "\nСтрелки направление движения.\nS - запись ситуации.\n0 - выход без сохранения.\n";
+		distination = _getch();
+		if (distination == 72) distination_to(0,-1);
+		if (distination == 80) distination_to(0,1);
+		if (distination == 75) distination_to(-1,0);
+		if (distination == 77) distination_to(1,0);
+		if (distination == 's'|| distination == 'S') save_map();
+		if (distination == '0') break;
+	}
 }
+

@@ -31,6 +31,8 @@ class Krot
 	int krot_map[10][10]{ 0 };
 	bool completing_the_map();
 	void input_error();
+	void distination_to(int x, int y); //отработка движения крота
+	bool the_end();
 public:
 	void print_map();
 	void creating_map();//создание карты
